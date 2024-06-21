@@ -126,3 +126,22 @@ infl |>
   autoplot() + labs(title= "Inflacion argentina 2003-2023",
                     subtitle= "Correlograma")
 ```
+
+Acá el gráfico de la inflación sin la función autoplot
+
+```{r}
+p_static <- ggplot(infl, aes(x = periodo, y = inflacion)) +
+  geom_line(color = "blue") +
+  labs(title = "Inflation in Argentina",
+       x = "Date",
+       y = "Inflation (%)") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    axis.title.x = element_text(size = 12),
+    axis.title.y = element_text(size = 12),
+    axis.text = element_text(size = 10)
+  )
+
+print(p_static)
+```
