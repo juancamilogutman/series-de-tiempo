@@ -5,6 +5,9 @@ library(ggplot2) #Para graficar
 library(knitr) #Para tablas
 library(fpp3) #No recuerdo para que era
 library(vars)
+library(urca)
+library(ggplot2)
+library(forecast) # Assuming autoplot comes from the forecast package
 
 # library(readxl)
 # base_excel <- read_excel("TP 2 - Datos.xlsx")
@@ -30,6 +33,9 @@ df <- df %>%
 
 df <- df %>% as_tsibble(index = t)
 
+df <- df %>% mutate(log_EXPO = log(df$EXPO))
+df <- df %>% mutate(log_IMPO = log(df$IMPO)) 
+
 # Plot PBI ARG
 autoplot(df, PBI_ARG) +
   labs(title = "PBI Argentino",
@@ -37,8 +43,33 @@ autoplot(df, PBI_ARG) +
        y = "PBI")
 
 # Plot EXPO ARG
-autoplot(df, EXPO) +
-  labs(title = "PBI Argentino",
+autoplot(df, log_EXPO) +
+  labs(title = "Exportaciones Argentinas",
        subtitle = "1996-2019",
-       y = "PBI")
- 
+       y = "Exportaciones")
+
+# Plot IMPO ARG
+autoplot(df, log_IMPO) +
+  labs(title = "Importaciones Argentinas",
+       subtitle = "1996-2019",
+       y = "Importaciones")
+
+
+
+# Your data frame 'df' should have the columns 'log_EXPO' and 'log_IMPO'
+
+# Create the base plot with the export data
+combined_plot <- autoplot(df, log_EXPO) +
+  labs(title = "Exportaciones e Importaciones Argentinas",
+       subtitle = "1996-2019",
+       y = "Logaritmo de Exportaciones") +
+  theme_minimal()
+
+# Add the import data as a layer
+combined_plot <- combined_plot + 
+  autolayer(df, log_IMPO, series = "Importaciones") +
+  labs(y = "Logaritmo de Exportaciones e Importaciones") +
+  theme_minimal()
+
+# Print the combined plot
+print(combined_plot)
