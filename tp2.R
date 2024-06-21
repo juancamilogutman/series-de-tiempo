@@ -9,6 +9,8 @@ library(urca)
 library(ggplot2)
 library(forecast) # Assuming autoplot comes from the forecast package
 
+# LIMPIEZA ####
+
 # library(readxl)
 # base_excel <- read_excel("TP 2 - Datos.xlsx")
 # saveRDS(excel_data, "base_tp2.rds")
@@ -17,7 +19,7 @@ df <- readRDS("base_tp2.RDS")
 
 df <- df %>%
   rename(
-    t = ...1,
+    Q = ...1,
     PBI_ARG = PIBARG,
     PBI_SOCIOS = PIBSOCIOS
   )
@@ -29,12 +31,25 @@ names(df)
 
 # Formato fechas:
 df <- df %>%
-  mutate(t = yearquarter(t))
+  mutate(t = yearquarter(Q))
 
-df <- df %>% as_tsibble(index = t)
+df <- df %>% as_tsibble(index = Q)
 
-df <- df %>% mutate(log_EXPO = log(df$EXPO))
-df <- df %>% mutate(log_IMPO = log(df$IMPO)) 
+#Las variables en logaritmo
+df <- df %>% mutate(log_X = log(df$EXPO))
+df <- df %>% mutate(log_M = log(df$IMPO))
+df <- df %>% mutate(log_PBI_Arg = log(df$PBI_ARG))
+df <- df %>% mutate(log_PBI_Socios = log(df$PBI_SOCIOS))
+df <- df %>% mutate(log_TCRM = log(df$TCRM))
+
+names(df)
+
+base <- df %>% select(Q,
+                      log_X)
+                      log_M,
+                      log_PBI_Arg,
+                      log_PBI_Socios,
+                      log_TCRM)
 
 # Plot PBI ARG
 autoplot(df, PBI_ARG) +
@@ -54,29 +69,19 @@ autoplot(df, log_IMPO) +
        subtitle = "1996-2019",
        y = "Importaciones")
 
-
-
-# Your data frame 'df' should have the columns 'log_EXPO' and 'log_IMPO'
-
-# Create the base plot with the export data
 combined_plot <- autoplot(df, log_EXPO) +
   labs(title = "Exportaciones e Importaciones Argentinas",
        subtitle = "1996-2019",
        y = "Logaritmo de Exportaciones") +
   theme_minimal()
 
-# Add the import data as a layer
 combined_plot <- combined_plot + 
   autolayer(df, log_IMPO, series = "Importaciones") +
   labs(y = "Logaritmo de Exportaciones e Importaciones") +
   theme_minimal()
 
-# Print the combined plot
 print(combined_plot)
 
-#La hipótesis nula del test es que hay raíz unitaria.
-resultado_adf_impo <- ur.df(df$IMPO)
-resultado_adf_log_impo <- ur.df(df$log_IMPO)
+# ARRANCA LO IMPORTANTE ####
 
-print(resultado_adf_impo)
-print(resultado_adf_log_impo)
+
