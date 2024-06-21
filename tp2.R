@@ -73,3 +73,10 @@ combined_plot <- combined_plot +
 
 # Print the combined plot
 print(combined_plot)
+
+#La hipótesis nula del test es que hay raíz unitaria.
+resultado_adf_impo <- ur.df(df$IMPO)
+resultado_adf_log_impo <- ur.df(df$log_IMPO)
+
+print(resultado_adf_impo)
+print(resultado_adf_log_impo)
