@@ -43,10 +43,9 @@ variables_log <- c("log_X",
                    "log_PBI_Socios",
                    "log_TCRM",
                    "log_demandaGlobal"
-                   ) 
+                   )
 
 # HASTA ACÁ AGREGUÉ LA DEMANDA GLOBAL
-
 tabla_ADF <- data.frame(variables_log, p.values)
 tabla_ADF
 
