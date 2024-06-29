@@ -20,13 +20,23 @@
 #ctrl shift C comenta
 #ctrl shift 1 y 2 
 
-#Slicing 2001
-start_2001_Q1 <- which(df$Q == yearquarter("2001 Q1"))
-df_pre_2001 <- df %>% slice(1:(start_2001_Q1 - 1))
-df_post_2001 <- df %>% slice(start_2001_Q1:n())
+# #Slicing 2001
+# start_2001_Q1 <- which(df$Q == yearquarter("2001 Q1"))
+# df_pre_2001 <- df %>% slice(1:(start_2001_Q1 - 1))
+# df_post_2001 <- df %>% slice(start_2001_Q1:n())
+# 
+# 
+# df_post_2001_long <- df_post_2001 %>%
+#   pivot_longer(cols = c(log_X, log_PBI_Socios, log_TCRM), 
+#                names_to = "series", 
+#                values_to = "value")
 
+# ggplot(df_X_long, aes(x = Q, y = value, color = series)) +
+#   geom_line() +
+#   theme_minimal() +
+#   labs(title = "Time Series Plot", x = "Quarter", y = "Log Value")
 
-df_post_2001_long <- df_post_2001 %>%
-  pivot_longer(cols = c(log_X, log_PBI_Socios, log_TCRM), 
-               names_to = "series", 
-               values_to = "value")
+# X_impo <- cbind(df$log_PBI_Arg, df$log_TCRM)
+# coint.test(df$log_M, X_impo, d = 1, nlag = NULL, output = TRUE)
+# coint.test(df$log_M, X_impo, d = 0, nlag = NULL, output = TRUE)
+

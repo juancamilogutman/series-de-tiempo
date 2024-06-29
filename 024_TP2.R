@@ -46,6 +46,7 @@ variables_log <- c("log_X",
                    "log_demandaGlobal"
                    )
 
+# HASTA ACÁ AGREGUÉ LA DEMANDA GLOBAL
 tabla_ADF <- data.frame(variables_log, p.values)
 tabla_ADF
 
@@ -54,20 +55,17 @@ adf_dlog_M <- tseries::adf.test(diff(df$log_M))
 adf_dlog_PBI_Arg <- tseries::adf.test(diff(df$log_PBI_Arg))
 adf_dlog_PBI_Socios <- tseries::adf.test(diff(df$log_PBI_Socios))
 adf_dlog_TCRM <- tseries::adf.test(diff(df$log_TCRM))
-adf_dlog_demandaGlobal <- tseries::adf.test(diff(df$log_demandaGlobal))
 
 p_values_diff <- c(adf_dlog_X[["p.value"]],
                    adf_dlog_M[["p.value"]],
                    adf_dlog_PBI_Arg[["p.value"]],
                    adf_dlog_PBI_Socios[["p.value"]],
-                   adf_dlog_TCRM[["p.value"]],
-                   adf_dlog_demandaGlobal[["p.value"]]) 
+                   adf_dlog_TCRM[["p.value"]]) 
 
 variables_dlog <- c("dlog_X",
                     "dlog_M",
                     "dlog_PBI_Arg",
                     "dlog_PBI_Socios",
-                    "dlog_TCRM",
                     "dlog_TCRM")
 
 tabla_dADF <- data.frame(variables_dlog, p_values_diff)
@@ -87,61 +85,14 @@ rm(adf_log_X,
    adf_dlog_TCRM
    )
 
-# Chequeamos la estabilidad estructural de la función de importaciones
-# TEST DE CHOW IMPO
+#Chequeamos la estabilidad estructural de la función de importaciones
+#TEST DE CHOW IMPO
 sctest(log_M ~ log_PBI_Arg + log_TCRM, type="Chow", point=24, data=df)
 
-######################
-results <- data.frame(Point = integer(), P_Value = numeric())
-
-for (i in 1:nrow(df)) {
-  test_result <- tryCatch({
-    sctest(log_M ~ log_PBI_Arg + log_TCRM, type = "Chow", point = i, data = df)
-  }, error = function(e) {
-    return(list(p.value = NA))  # Return a list with NA p.value if there's an error
-  })
-  
-  # Check if the p.value is NA or not
-  if (!is.na(test_result$p.value)) {
-    results <- rbind(results, data.frame(Point = i, P_Value = test_result$p.value))
-  }
-}
-
-kable(results, caption = "P-Values from Structural Change Test")
-######################
-results_M <- data.frame(Point = integer(), P_Value = numeric())
-
-for (i in 1:nrow(df)) {
-  test_result <- tryCatch({
-    sctest(log_M ~ log_PBI_Arg + log_TCRM, type = "Chow", point = i, data = df)
-  }, error = function(e) {
-    return(list(p.value = NA))  # Return a list with NA p.value if there's an error
-  })
-  
-  # Check if the p.value is NA or not
-  if (!is.na(test_result$p.value)) {
-    results_M <- rbind(results, data.frame(Point = i, P_Value = test_result$p.value))
-  }
-}
-
-kable(results, caption = "P-Values from Structural Change Test")
-######################
-results_X <- data.frame(Point = integer(), P_Value = numeric())
-
-for (i in 1:nrow(df)) {
-  test_result <- tryCatch({
-    sctest(log_X ~ log_PBI_Socios + log_TCRM, type = "Chow", point = i, data = df)
-  }, error = function(e) {
-    return(list(p.value = NA))  # Return a list with NA p.value if there's an error
-  })
-  
-  # Check if the p.value is NA or not
-  if (!is.na(test_result$p.value)) {
-    results_X <- rbind(results, data.frame(Point = i, P_Value = test_result$p.value))
-  }
-}
-######################
-
+X_impo <- cbind(df$log_PBI_Arg)
+# X_impo <- cbind(df$log_PBI_Arg, df$log_TCRM)
+coint.test(df$log_M, X_impo, d = 1, nlag = NULL, output = TRUE)
+coint.test(df$log_M, X_impo, d = 0, nlag = NULL, output = TRUE)
 
 # ECM IMPORTACIONES (bivariado, uniecuacional)
 reg_coint_impo <- lm(log_M ~ log_PBI_Arg,data=df) #Relación de largo plazo
@@ -149,30 +100,22 @@ residuos_impo <- reg_coint_impo$residuals # Capturamos los residuos
 tseries::adf.test(residuos_impo) # Vemos si el residuo es estacionario (OK)
 
 residuos_impo_lag <- -lag(residuos_impo)[-1]
-ecm_impo_2 <- lm(diff(log_M) ~ residuos_impo_lag + diff(log_PBI_Arg), data = df)
-summary(ecm_impo_2)
+ecm_impo <- lm(diff(log_M) ~ residuos_impo_lag + diff(log_PBI_Arg), data = df)
+summary(ecm_impo)
 
 # ECM IMPORTACIONES (trivariado, uniecuacional)
-reg_coint_impo_3 <- lm(log_M ~ log_PBI_Arg + log_TCRM,data=df)
-residuos_impo_3 <- reg_coint_impo_3$residuals
-tseries::adf.test(residuos_impo_3)
+reg_coint_impo_3 <- lm(log_M ~ log_PBI_Arg + log_TCRM,data=df) #Relación de largo plazo
+residuos_impo_3 <- reg_coint_impo_3$residuals # Capturamos los residuos
+tseries::adf.test(residuos_impo_3) # Vemos si el residuo es estacionario
 
-residuos_impo_3_lag <- -lag(residuos_impo_3)[-1]
-ecm_impo_3 <- lm(diff(log_M) ~ residuos_impo_3_lag + diff(log_PBI_Arg) + diff(log_TCRM), data = df)
-summary(reg_coint_impo_3)
-summary(ecm_impo_3)
+residuos_impo_3_lag <- -lag(residuos_impo_3)[-1] #Rezagamos el residuo
+ecm_impo <- lm(diff(log_M) ~ residuos_impo_3_lag + diff(log_PBI_Arg) + diff(log_TCRM), data = df)
+summary(ecm_impo) #Modelamos el ECM
 
 # Importaciones con Wicken y Breusch, 2 variables
 log_M_lag <- lag(df$log_M)[-1]
 log_PBI_Arg_lag <- lag(df$log_PBI_Arg)[-1]
 wb_impo_2 <- lm(diff(log_M) ~ diff(log_PBI_Arg) + log_M_lag + log_PBI_Arg_lag, data = df)
-summary(wb_impo_2)
-
-# Importaciones con Wicken y Breusch, 3 variables
-log_M_lag <- lag(df$log_M)[-1]
-log_PBI_Arg_lag <- lag(df$log_PBI_Arg)[-1]
-wb_impo_3 <- lm(diff(log_M) ~ diff(log_PBI_Arg) + log_M_lag + log_PBI_Arg_lag, data = df)
-summary(wb_impo_3)
 
 # Faltaría chequear con el test de johansen:
 # data_vecm <- df[, c("log_M", "log_TCRM", "log_PBI_Arg")]

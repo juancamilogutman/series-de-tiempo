@@ -4,7 +4,7 @@ library(tidyverse) #Para manejar bases de datos
 library(tsibble) #Para manejar bases para series de tiempo
 library(ggplot2) #Para graficar
 library(knitr) #Para tablas
-# library(fpp3) #No recuerdo para que era
+library(fpp3) #No recuerdo para que era
 # library(vars)
 # library(tseries)
 # library(urca) #para el adf.test
@@ -20,7 +20,9 @@ str(df)
 head(df, 15)
 tail(df, 15)
 
-# Gráfico Impo vs Expo
+######################
+# Plot Impo vs. Expo #
+######################
 plot_impo_expo <- autoplot(df, log_X, color="Blue") +
   labs(title = "Exportaciones e Importaciones Argentinas",
        subtitle = "1996-2019",
@@ -34,30 +36,51 @@ plot_impo_expo <- plot_impo_expo +
 
 print(plot_impo_expo)
 
-
-df_long <- df %>%
+#######################
+# Plot Variables Expo #
+#######################
+df_X_long <- df %>%
   pivot_longer(cols = c(log_X, log_PBI_Socios, log_TCRM),
                names_to = "series",
                values_to = "value")
 
-ggplot(df_long, aes(x = Q, y = value, color = series)) +
-  geom_line() +
-  theme_minimal() +
-  labs(title = "Time Series Plot", x = "Quarter", y = "Log Value")
+df_X_long <- df_X_long[, c("Q", "series", "value"), drop = FALSE]
 
-para_plot <- df_long[, c("Q", "series", "value"), drop = FALSE]
-
-para_plot <- para_plot %>%
-  filter(para_plot$series == "log_M")
-
-autoplot(para_plot) +
-  facet_wrap(~ para_plot$series) + # Replace key_variable with your actual key column
+autoplot(df_X_long) +
   labs(x = "Año", y = "Variables",
-       title = "Argentina: PIB, importaciones y tipo de cambio real") +
-  guides(colour=guide_legend(title="Variables"))
-# 
-# ggplot(df_post_2001_long, aes(x = Q, y = value, color = series)) +
-#   geom_line() +
-#   scale_x_yearquarter(date_breaks = "1 quarter") + 
-#   theme_minimal() +
-#   labs(title = "Time Series Plot", x = "Quarter", y = "Log Value")
+       title = "Argentina: Exportaciones, PBI de Socios Comerciales y Tipo de Cambio Real Multilateral") +
+  guides(colour=guide_legend(title="Variables")) +
+  facet_wrap(~series, scales = "free")
+
+#######################
+# Plot Variables Impo #
+#######################
+df_M_long <- df %>%
+  pivot_longer(cols = c(log_M, log_demandaGlobal, log_TCRM),
+               names_to = "series",
+               values_to = "value")
+
+df_M_long <- df_M_long[, c("Q", "series", "value"), drop = FALSE]
+
+autoplot(df_M_long) +
+  labs(x = "Año", y = "Variables",
+       title = "Argentina: Importaciones, Demanda Global y Tipo de Cambio Real Multilateral") +
+  guides(colour=guide_legend(title="Variables")) +
+  facet_wrap(~series, scales = "free")
+
+#######################
+# Plot PBI vs dGlobal #
+#######################
+df_dg_long <- df %>%
+  pivot_longer(cols = c(log_PBI_Arg, log_demandaGlobal),
+               names_to = "series",
+               values_to = "value")
+
+df_dg_long <- df_dg_long[, c("Q", "series", "value"), drop = FALSE]
+
+autoplot(df_dg_long) +
+  labs(x = "Año", y = "Variables",
+       title = "Argentina: Producto Bruto Interno y Demanda Global") +
+  guides(colour=guide_legend(title="Variables")) +
+  facet_wrap(~series, scales = "free", nrow = 2)
+
