@@ -12,92 +12,7 @@ library(forecast)#para el auto.arima
 library(aTSA)
 library(fable) #Para correr modelos de series de tiempo
 
-# LIMPIEZA ####
-
-# library(readxl)
-# base_excel <- read_excel("TP 2 - Datos.xlsx")
-# saveRDS(excel_data, "base_tp2.rds")
-
-df <- readRDS("base_tp2.RDS")
-
-df <- df %>%
-  rename(
-    Q = ...1,
-    PBI_ARG = PIBARG,
-    PBI_SOCIOS = PIBSOCIOS
-  )
-
-# Pequeña exploración
-kable(head(df, 15))
-kable(tail(df, 15))
-names(df)
-
-# Formato fechas:
-df <- df %>%
-  mutate(Q = yearquarter(Q))
-
-df <- df %>% as_tsibble(index = Q)
-
-#Las variables en logaritmo
-df <- df %>% mutate(log_X = log(df$EXPO))
-df <- df %>% mutate(log_M = log(df$IMPO))
-df <- df %>% mutate(log_PBI_Arg = log(df$PBI_ARG))
-df <- df %>% mutate(log_PBI_Socios = log(df$PBI_SOCIOS))
-df <- df %>% mutate(log_TCRM = log(df$TCRM))
-
-# combined_plot <- autoplot(df, log_X, color="Blue") +
-#   labs(title = "Exportaciones e Importaciones Argentinas",
-#        subtitle = "1996-2019",
-#        y = "Logaritmo de Exportaciones", x= "Año y trimestre") + 
-#   theme_minimal()
-# 
-# combined_plot <- combined_plot + 
-#   autolayer(df, log_M, series = "Importaciones", colour="Red") +
-#   labs(y = "Logaritmo de Exportaciones e Importaciones") +
-#   theme_minimal()
-# 
-# print(combined_plot)
-# 
-# otro_autoplot <- autoplot(df, log_PBI_Socios, color="Blue") +
-#   labs(title = "Exportaciones e Importaciones Argentinas",
-#        subtitle = "1996-2019",
-#        y = "Logaritmo de Exportaciones",
-#        x= "Año y trimestre") + 
-#   theme_minimal() 
-# 
-# otro_autoplot + autolayer(df, log_PBI_Arg, series = "Importaciones", colour="Red") +
-#   labs(y = "Logaritmo de Exportaciones e Importaciones") +
-#   theme_minimal()
-# 
-# df_long <- df %>%
-#   pivot_longer(cols = c(log_X, log_PBI_Socios, log_TCRM), 
-#                names_to = "series", 
-#                values_to = "value")
-# 
-# ggplot(df_long, aes(x = Q, y = value, color = series)) +
-#   geom_line() +
-#   theme_minimal() +
-#   labs(title = "Time Series Plot", x = "Quarter", y = "Log Value")
-# 
-# names(df)
-# 
-# 
-# para_plot <- df[, c("Q", "log_M", "log_PBI_Arg", "log_TCRM"), drop = FALSE]
-# 
-# 
-# autoplot(para_plot) +
-#   facet_wrap(~ para_plot$Q) + # Replace key_variable with your actual key column
-#   labs(x = "Año", y = "Variables", 
-#        title = "Argentina: PIB, importaciones y tipo de cambio real") +
-#   guides(colour=guide_legend(title="Variables"))
-# 
-# ggplot(df_post_2001_long, aes(x = Q, y = value, color = series)) +
-#   geom_line() +
-#   scale_x_yearquarter(date_breaks = "1 quarter") + 
-#   theme_minimal() +
-#   labs(title = "Time Series Plot", x = "Quarter", y = "Log Value")
-
-# ARRANCA LO IMPORTANTE ####
+df <- readRDS("bases/base_tp2.RDS")
 
 #Hacemos los test de Dickey-Fuller y reportamos los resultados
 #en una tabla
@@ -105,25 +20,32 @@ df <- df %>% mutate(log_TCRM = log(df$TCRM))
 #para las series originales y sus primeras diferencias.
 #encontramos que todas tienen el mismo orden de integración.
 
+
+
 adf_log_X <- tseries::adf.test(df$log_X)
 adf_log_M <- tseries::adf.test(df$log_M)
 adf_log_PBI_Arg <- tseries::adf.test(df$log_PBI_Arg)
 adf_log_PBI_Socios <- tseries::adf.test(df$log_PBI_Socios)
 adf_log_TCRM <- tseries::adf.test(df$log_TCRM)
+adf_log_demandaGlobal <- tseries::adf.test(df$log_demandaGlobal)
 
 p.values <- c(adf_log_X[["p.value"]],
               adf_log_M[["p.value"]],
               adf_log_PBI_Arg[["p.value"]],
               adf_log_PBI_Socios[["p.value"]],
-              adf_log_TCRM[["p.value"]]
+              adf_log_TCRM[["p.value"]],
+              adf_log_demandaGlobal[["p.value"]]
               ) 
 
 variables_log <- c("log_X",
                    "log_M",
                    "log_PBI_Arg",
                    "log_PBI_Socios",
-                   "log_TCRM"
+                   "log_TCRM",
+                   "log_demandaGlobal"
                    ) 
+
+# HASTA ACÁ AGREGUÉ LA DEMANDA GLOBAL
 
 tabla_ADF <- data.frame(variables_log, p.values)
 tabla_ADF
