@@ -92,23 +92,6 @@ rm(adf_log_X,
 sctest(log_M ~ log_PBI_Arg + log_TCRM, type="Chow", point=24, data=df)
 
 ######################
-results <- data.frame(Point = integer(), P_Value = numeric())
-
-for (i in 1:nrow(df)) {
-  test_result <- tryCatch({
-    sctest(log_M ~ log_PBI_Arg + log_TCRM, type = "Chow", point = i, data = df)
-  }, error = function(e) {
-    return(list(p.value = NA))  # Return a list with NA p.value if there's an error
-  })
-  
-  # Check if the p.value is NA or not
-  if (!is.na(test_result$p.value)) {
-    results <- rbind(results, data.frame(Point = i, P_Value = test_result$p.value))
-  }
-}
-
-kable(results, caption = "P-Values from Structural Change Test")
-######################
 results_M <- data.frame(Point = integer(), P_Value = numeric())
 
 for (i in 1:nrow(df)) {
@@ -120,11 +103,20 @@ for (i in 1:nrow(df)) {
   
   # Check if the p.value is NA or not
   if (!is.na(test_result$p.value)) {
-    results_M <- rbind(results, data.frame(Point = i, P_Value = test_result$p.value))
+    results_M <- rbind(results_M, data.frame(Point = i, P_Value = test_result$p.value))
   }
 }
 
-kable(results, caption = "P-Values from Structural Change Test")
+kable(results_M, caption = "P-Values from Structural Change Test")
+
+ggplot(results_M, aes(x = Point, y = P_Value)) +
+  geom_point() +  # Add points to the plot
+  geom_hline(yintercept = 0.05, linetype = "dashed", color = "red") +
+  scale_y_log10() +  # Use a logarithmic scale for the y-axis to better display small p-values
+  labs(title = "P-Values from Structural Change Test",
+       x = "Point",
+       y = "P-Value") +
+  theme_minimal() 
 ######################
 results_X <- data.frame(Point = integer(), P_Value = numeric())
 
@@ -137,9 +129,21 @@ for (i in 1:nrow(df)) {
   
   # Check if the p.value is NA or not
   if (!is.na(test_result$p.value)) {
-    results_X <- rbind(results, data.frame(Point = i, P_Value = test_result$p.value))
+    results_X <- rbind(results_X, data.frame(Point = i, P_Value = test_result$p.value))
   }
 }
+
+kable(results_X, caption = "P-Values from Structural Change Test")
+
+ggplot(results_X, aes(x = Point, y = P_Value)) +
+  geom_point() +  # Add points to the plot
+  geom_hline(yintercept = 0.05, linetype = "dashed", color = "red") +
+  scale_y_log10() +  # Use a logarithmic scale for the y-axis to better display small p-values
+  labs(title = "P-Values from Structural Change Test",
+       x = "Point",
+       y = "P-Value") +
+  theme_minimal() 
+
 ######################
 
 
