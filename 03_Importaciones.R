@@ -351,5 +351,17 @@ summary(wb_d2004)
 # VEC ####
 # Faltaría chequear con el test de johansen:
 data_vecm <- df[, c("log_M", "log_TCRM", "log_demandaGlobal")]
-vecm <- ca.jo(data_vecm, type="trace", ecdet="const", K=2)
+vecm <- ca.jo(data_vecm, type="trace", ecdet="const", K=4)
 summary(vecm)
+
+# # PRENESTOR:
+# data_vecm <- df[, c("log_M", "log_TCRM", "log_demandaGlobal")]
+# vecm <- ca.jo(data_vecm, type="trace", ecdet="const", K=4)
+# summary(vecm)
+
+
+## POST NESTOR:
+data_vecm_d2004 <- dfd2004[, c("log_M", "log_TCRM", "log_demandaGlobal")]
+vecm_d2004 <- ca.jo(data_vecm_d2004, type="trace", ecdet="const", K=4)
+summary(vecm_d2004)
+
