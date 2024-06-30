@@ -29,7 +29,7 @@ adf_log_M <- ur.df(df$log_M,
                    type = c("none"),
                    lags = 4,
                    selectlags = "AIC")
-summary(adf_log_M)
+summary(adf_log_M) 
 
 adf_log_demandaGlobal <- ur.df(df$log_demandaGlobal,
                    type = c("none"),
@@ -274,7 +274,7 @@ dfd2004 <- dfd2004 %>% mutate(log_TCRM = x11_log_TCRM_d2004$season_adjust)
 # Tests de Engle y Granger ####
 
 ## Base completa
-reg_coint <- lm(log_M ~ log_PBI_Arg + log_TCRM, data = df)
+reg_coint <- lm(log_M ~ log_demandaGlobal + log_TCRM, data = df)
 residuos_coint <- reg_coint$residuals
 test_eg <- ur.df(residuos_coint,
                    type = c("none"),
@@ -284,7 +284,7 @@ test_eg <- ur.df(residuos_coint,
 summary(test_eg)
 
 ## Base hasta 2003
-reg_coint_h2003 <- lm(log_M ~ log_PBI_Arg + log_TCRM, data = dfh2003)
+reg_coint_h2003 <- lm(log_M ~ log_demandaGlobal + log_TCRM, data = dfh2003)
 residuos_coint_h2003 <- reg_coint_h2003$residuals
 test_eg_h2003 <- ur.df(residuos_coint_h2003,
                  type = c("none"),
@@ -293,44 +293,63 @@ test_eg_h2003 <- ur.df(residuos_coint_h2003,
                  )
 summary(test_eg_h2003)
 
-## Base hasta 2003
-reg_coint_d2004 <- lm(log_M ~ log_PBI_Arg + log_TCRM, data = dfd2004)
+## Base desde 2004
+reg_coint_d2004 <- lm(log_M ~ log_demandaGlobal + log_TCRM, data = dfd2004)
 residuos_coint_d2004 <- reg_coint_d2004$residuals
 test_eg_d2004 <- ur.df(residuos_coint_d2004,
                        type = c("none"),
                        lags = 4,
                        selectlags = "AIC"
-                       )
+)
 summary(test_eg_d2004)
 
-# ECM (trivariado, uniecuacional)
-residuos_impo_3_lag <- -lag(residuos_impo_3)[-1]
-ecm_impo_3 <- lm(diff(log_M) ~ residuos_impo_3_lag + diff(log_PBI_Arg) + diff(log_TCRM), data = df)
-summary(reg_coint_impo_3)
-summary(ecm_impo_3)
+# ECM (trivariado, uniecuacional) ####
+## Base Completa
+residuos_coint_lag <- lag(residuos_coint)[-1]
+ecm <- lm(diff(log_M) ~ residuos_coint_lag + diff(log_demandaGlobal) + diff(log_TCRM), data = df)
+summary(reg_coint)
+summary(ecm)
 
-# Importaciones con Wicken y Breusch, 2 variables
+## Base hasta 2003
+residuos_coint_h2003_lag <- lag(residuos_coint_h2003)[-1]
+ecm_h2003 <- lm(diff(log_M) ~ residuos_coint_h2003_lag + diff(log_demandaGlobal) + diff(log_TCRM), data = dfh2003)
+summary(reg_coint_h2003)
+summary(ecm_h2003)
+
+## Base desde 2004
+residuos_coint_d2004_lag <- lag(residuos_coint_d2004)[-1]
+ecm_d2004 <- lm(diff(log_M) ~ residuos_coint_d2004_lag + diff(log_demandaGlobal) + diff(log_TCRM), data = dfd2004)
+summary(reg_coint_d2004)
+summary(ecm_d2004)
+
+
+# Identificación siguiendo a Wicken y Breusch ####
+## WB con base completa
 log_M_lag <- lag(df$log_M)[-1]
-log_PBI_Arg_lag <- lag(df$log_PBI_Arg)[-1]
-wb_impo_2 <- lm(diff(log_M) ~ diff(log_PBI_Arg) + log_M_lag + log_PBI_Arg_lag, data = df)
-summary(wb_impo_2)
+log_demandaGlobal_lag <- lag(df$log_demandaGlobal)[-1]
+log_TCRM_lag <- lag(df$log_TCRM)[-1]
 
-# Importaciones con Wicken y Breusch, 3 variables
-log_M_lag <- lag(df$log_M)[-1]
-log_PBI_Arg_lag <- lag(df$log_PBI_Arg)[-1]
-wb_impo_3 <- lm(diff(log_M) ~ diff(log_PBI_Arg) + log_M_lag + log_PBI_Arg_lag, data = df)
-summary(wb_impo_3)
+wb <- lm(diff(log_M) ~ diff(log_demandaGlobal)+ diff(log_TCRM) + log_M_lag + log_demandaGlobal_lag + log_TCRM_lag, data = df)
+summary(wb)
 
+## WB con base hasta 2003
+log_M_lag_h2003 <- lag(dfh2003$log_M)[-1]
+log_demandaGlobal_lag_h2003 <- lag(dfh2003$log_demandaGlobal)[-1]
+log_TCRM_lag_h2003 <- lag(dfh2003$log_TCRM)[-1]
+
+wb_h2003 <- lm(diff(log_M) ~ diff(log_demandaGlobal)+ diff(log_TCRM) + log_M_lag_h2003 + log_demandaGlobal_lag_h2003 + log_TCRM_lag_h2003, data = dfh2003)
+summary(wb_h2003)
+
+## WB con base desde 2004
+log_M_lag_d2004 <- lag(dfd2004$log_M)[-1]
+log_demandaGlobal_lag_d2004 <- lag(dfd2004$log_demandaGlobal)[-1]
+log_TCRM_lag_d2004 <- lag(dfd2004$log_TCRM)[-1]
+
+wb_d2004 <- lm(diff(log_M) ~ diff(log_demandaGlobal)+ diff(log_TCRM) + log_M_lag_d2004 + log_demandaGlobal_lag_d2004 + log_TCRM_lag_d2004, data = dfd2004)
+summary(wb_d2004)
+
+# VEC ####
 # Faltaría chequear con el test de johansen:
-# data_vecm <- df[, c("log_M", "log_TCRM", "log_PBI_Arg")]
-# vecm <- ca.jo(data_vecm, type="trace", ecdet="const", K=2)
-# summary(vecm)
-
-# Para las exportaciones
-# reg_coint_expo <- lm(log_X ~ log_PBI_Socios + log_TCRM,data=df)
-# residuos_expo <- reg_coint_expo$residuals
-# tseries::adf.test(residuos_expo)
-
-# X_expo <- cbind(df$log_PBI_Socios, df$log_TCRM)
-# coint.test(df$log_X, X_expo, d = 1, nlag = NULL, output = TRUE)
-# coint.test(df$log_X, X_expo, d = 0, nlag = NULL, output = TRUE)
+data_vecm <- df[, c("log_M", "log_TCRM", "log_demandaGlobal")]
+vecm <- ca.jo(data_vecm, type="trace", ecdet="const", K=2)
+summary(vecm)
