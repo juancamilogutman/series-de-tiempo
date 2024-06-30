@@ -102,6 +102,179 @@ tabla_ADF_d
 tabla_ADF_d_h2003
 tabla_ADF_d_d2004
 
+# Probando con URCA ####
+# Base completa
+adf_log_M <- ur.df(df$log_M,
+                   type = c("none"),
+                   lags = 4,
+                   selectlags = "AIC"
+                   )
+summary(adf_log_M)
+
+adf_log_demandaGlobal <- ur.df(df$log_demandaGlobal,
+                   type = c("none"),
+                   lags = 4,
+                   selectlags = "AIC")
+
+summary(adf_log_demandaGlobal)
+
+adf_log_TCRM <- ur.df(df$log_TCRM,
+                               type = c("none"),
+                               lags = 4)
+                               selectlags = "AIC")
+
+summary(adf_log_TCRM)
+
+# completa diferenciada
+
+adf_dlog_M <- ur.df(diff(df$log_M),
+                   type = c("none"),
+                   lags = 4,
+                   selectlags = "AIC"
+)
+summary(adf_dlog_M)
+
+adf_dlog_demandaGlobal <- ur.df(diff(df$log_demandaGlobal),
+                               type = c("none"),
+                               lags = 4,
+                               selectlags = "AIC")
+
+summary(adf_dlog_demandaGlobal)
+
+adf_dlog_TCRM <- ur.df(diff(df$log_TCRM),
+                      type = c("none"),
+                      lags = 4,
+                      selectlags = "AIC")
+
+summary(adf_dlog_TCRM)
+
+
+# hasta 2003 ####
+adf_log_M_h2003 <- ur.df(dfh2003$log_M,
+                   type = c("none"),
+                   lags = 4,
+                   selectlags = "AIC"
+)
+summary(adf_log_M_h2003)
+
+adf_log_demandaGlobal_h2003 <- ur.df(dfh2003$log_demandaGlobal,
+                               type = c("none"),
+                               lags = 4,
+                               selectlags = "AIC")
+
+summary(adf_log_demandaGlobal_h2003)
+
+adf_log_TCRM_h2003 <- ur.df(dfh2003$log_TCRM,
+                      type = c("none"),
+                      lags = 4,
+                      selectlags = "AIC")
+
+summary(adf_log_TCRM_h2003)
+
+# completa diferenciada
+
+adf_dlog_M_h2003 <- ur.df(diff(dfh2003$log_M),
+                    type = c("none"),
+                    lags = 4,
+                    selectlags = "AIC"
+                    )
+summary(adf_dlog_M_h2003)
+
+adf_dlog_demandaGlobal_h2003 <- ur.df(diff(dfh2003$log_demandaGlobal),
+                                type = c("none"),
+                                lags = 4,
+                                selectlags = "AIC")
+
+summary(adf_dlog_demandaGlobal_h2003)
+
+adf_dlog_TCRM_h2003 <- ur.df(diff(dfh2003$log_TCRM),
+                       type = c("none"),
+                       lags = 4,
+                       selectlags = "AIC")
+
+summary(adf_dlog_TCRM_h2003)
+
+# desde 2004 ####
+
+adf_log_M_d2004 <- ur.df(dfd2004$log_M,
+                   type = c("none"),
+                   lags = 4,
+                   selectlags = "AIC"
+                   )
+summary(adf_log_M_d2004)
+
+adf_log_demandaGlobal_d2004 <- ur.df(dfd2004$log_demandaGlobal,
+                               type = c("none"),
+                               lags = 4,
+                               selectlags = "AIC")
+
+summary(adf_log_demandaGlobal_d2004)
+
+adf_log_TCRM_d2004 <- ur.df(dfd2004$log_TCRM,
+                      type = c("none"),
+                      lags = 4,
+                      selectlags = "AIC")
+
+summary(adf_log_TCRM_d2004)
+
+# completa diferenciada
+
+adf_dlog_M_d2004 <- ur.df(diff(dfd2004$log_M),
+                    type = c("none"),
+                    lags = 4,
+                    selectlags = "AIC"
+                    )
+summary(adf_dlog_M_d2004)
+
+adf_dlog_demandaGlobal_d2004 <- ur.df(diff(dfd2004$log_demandaGlobal),
+                                type = c("none"),
+                                lags = 4,
+                                selectlags = "AIC"
+                                )
+
+summary(adf_dlog_demandaGlobal_d2004)
+
+adf_dlog_TCRM_d2004 <- ur.df(diff(dfd2004$log_TCRM),
+                       type = c("none"),
+                       lags = 4,
+                       selectlags = "AIC")
+
+summary(adf_dlog_TCRM_d2004)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # rm(adf_log_X,
 #    adf_log_M,
 #    adf_log_PBI_Arg,
