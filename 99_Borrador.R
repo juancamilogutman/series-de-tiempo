@@ -40,3 +40,11 @@
 # coint.test(df$log_M, X_impo, d = 1, nlag = NULL, output = TRUE)
 # coint.test(df$log_M, X_impo, d = 0, nlag = NULL, output = TRUE)
 
+# # ECM IMPORTACIONES (bivariado, uniecuacional)
+# reg_coint_impo <- lm(log_M ~ log_PBI_Arg,data=df) #Relación de largo plazo
+# residuos_impo <- reg_coint_impo$residuals # Capturamos los residuos
+# tseries::adf.test(residuos_impo) # Vemos si el residuo es estacionario (OK)
+# 
+# residuos_impo_lag <- -lag(residuos_impo)[-1]
+# ecm_impo_2 <- lm(diff(log_M) ~ residuos_impo_lag + diff(log_PBI_Arg), data = df)
+# summary(ecm_impo_2)

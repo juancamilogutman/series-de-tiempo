@@ -1,3 +1,4 @@
+# Inicialización ####
 rm(list = ls())
 
 library(tidyverse) #Para manejar bases de datos
@@ -17,98 +18,17 @@ df <- readRDS("bases/base_tp2.RDS")
 dfh2003 <- readRDS("bases/base_tp2_h2003.RDS")
 dfd2004 <- readRDS("bases/base_tp2_d2004.RDS")
 
-#################
+
+# Adfs ####
+
+#---------------#
 # BASE COMPLETA #
-#################
-adf_log_M <- tseries::adf.test(df$log_M)
-adf_log_demandaGlobal <- tseries::adf.test(df$log_demandaGlobal)
-adf_log_TCRM <- tseries::adf.test(df$log_TCRM)
+#---------------#
 
-adf_log_M_h2003 <- tseries::adf.test(dfh2003$log_M)
-adf_log_demandaGlobal_h2003 <- tseries::adf.test(dfh2003$log_demandaGlobal)
-adf_log_TCRM_h2003 <- tseries::adf.test(dfh2003$log_TCRM)
-
-adf_log_M_d2004 <- tseries::adf.test(dfd2004$log_M)
-adf_log_demandaGlobal_d2004 <- tseries::adf.test(dfd2004$log_demandaGlobal)
-adf_log_TCRM_d2004 <- tseries::adf.test(dfd2004$log_TCRM)
-
-p.values <- c(adf_log_M[["p.value"]],
-              adf_log_demandaGlobal[["p.value"]],
-              adf_log_TCRM[["p.value"]]
-              ) 
-
-p.values_h2003 <- c(adf_log_M_h2003[["p.value"]],
-              adf_log_demandaGlobal_h2003[["p.value"]],
-              adf_log_TCRM_h2003[["p.value"]]
-)
-
-p.values_d2004 <- c(adf_log_M_d2004[["p.value"]],
-              adf_log_demandaGlobal_d2004[["p.value"]],
-              adf_log_TCRM_d2004[["p.value"]]
-)
-
-variables_log <- c("log_M",
-                   "log_demandaGlobal",
-                   "log_TCRM"
-                   )
-
-tabla_ADF <- data.frame(variables_log, p.values)
-tabla_ADF_h2003 <- data.frame(variables_log, p.values_h2003)
-tabla_ADF_d2004 <- data.frame(variables_log, p.values_d2004)
-
-tabla_ADF
-tabla_ADF_h2003
-tabla_ADF_d2004
-
-#### PARA LAS DIFERENCIAS ####
-
-adf_dlog_M <- tseries::adf.test(diff(df$log_M))
-adf_dlog_demandaGlobal <- tseries::adf.test(diff(df$log_demandaGlobal))
-adf_dlog_TCRM <- tseries::adf.test(diff(df$log_TCRM))
-
-adf_dlog_M_h2003 <- tseries::adf.test(diff(dfh2003$log_M))
-adf_dlog_demandaGlobal_h2003 <- tseries::adf.test(diff(dfh2003$log_demandaGlobal))
-adf_dlog_TCRM_h2003 <- tseries::adf.test(diff(dfh2003$log_TCRM))
-
-adf_dlog_M_d2004 <- tseries::adf.test(diff(dfd2004$log_M))
-adf_dlog_demandaGlobal_d2004 <- tseries::adf.test(diff(dfd2004$log_demandaGlobal))
-adf_dlog_TCRM_d2004 <- tseries::adf.test(diff(dfd2004$log_TCRM))
-
-p.values_d <- c(adf_dlog_M[["p.value"]],
-              adf_dlog_demandaGlobal[["p.value"]],
-              adf_dlog_TCRM[["p.value"]]
-) 
-
-p.values_d_h2003 <- c(adf_dlog_M_h2003[["p.value"]],
-                    adf_dlog_demandaGlobal_h2003[["p.value"]],
-                    adf_dlog_TCRM_h2003[["p.value"]]
-)
-
-p.values_d_d2004 <- c(adf_dlog_M_d2004[["p.value"]],
-                    adf_dlog_demandaGlobal_d2004[["p.value"]],
-                    adf_dlog_TCRM_d2004[["p.value"]]
-)
-
-variables_log <- c("log_M",
-                   "log_demandaGlobal",
-                   "log_TCRM"
-)
-
-tabla_ADF_d <- data.frame(variables_log, p.values_d)
-tabla_ADF_d_h2003 <- data.frame(variables_log, p.values_d_h2003)
-tabla_ADF_d_d2004 <- data.frame(variables_log, p.values_d_d2004)
-
-tabla_ADF_d
-tabla_ADF_d_h2003
-tabla_ADF_d_d2004
-
-# Probando con URCA ####
-# Base completa
 adf_log_M <- ur.df(df$log_M,
                    type = c("none"),
                    lags = 4,
-                   selectlags = "AIC"
-                   )
+                   selectlags = "AIC")
 summary(adf_log_M)
 
 adf_log_demandaGlobal <- ur.df(df$log_demandaGlobal,
@@ -120,18 +40,19 @@ summary(adf_log_demandaGlobal)
 
 adf_log_TCRM <- ur.df(df$log_TCRM,
                                type = c("none"),
-                               lags = 4)
+                               lags = 4,
                                selectlags = "AIC")
 
 summary(adf_log_TCRM)
 
-# completa diferenciada
+#------------------------------#
+# BASE COMPLETA EN DIFERENCIAS #
+#------------------------------#
 
 adf_dlog_M <- ur.df(diff(df$log_M),
                    type = c("none"),
                    lags = 4,
-                   selectlags = "AIC"
-)
+                   selectlags = "AIC")
 summary(adf_dlog_M)
 
 adf_dlog_demandaGlobal <- ur.df(diff(df$log_demandaGlobal),
@@ -148,13 +69,14 @@ adf_dlog_TCRM <- ur.df(diff(df$log_TCRM),
 
 summary(adf_dlog_TCRM)
 
+#-----------------#
+# BASE HASTA 2003 #
+#-----------------#
 
-# hasta 2003 ####
 adf_log_M_h2003 <- ur.df(dfh2003$log_M,
                    type = c("none"),
                    lags = 4,
-                   selectlags = "AIC"
-)
+                   selectlags = "AIC")
 summary(adf_log_M_h2003)
 
 adf_log_demandaGlobal_h2003 <- ur.df(dfh2003$log_demandaGlobal,
@@ -171,7 +93,9 @@ adf_log_TCRM_h2003 <- ur.df(dfh2003$log_TCRM,
 
 summary(adf_log_TCRM_h2003)
 
-# completa diferenciada
+#------------------------------#
+# BASE HASTA 2003 DIFERENCIADA #
+#------------------------------#
 
 adf_dlog_M_h2003 <- ur.df(diff(dfh2003$log_M),
                     type = c("none"),
@@ -194,7 +118,9 @@ adf_dlog_TCRM_h2003 <- ur.df(diff(dfh2003$log_TCRM),
 
 summary(adf_dlog_TCRM_h2003)
 
-# desde 2004 ####
+#-----------------#
+# BASE DESDE 2004 #
+#-----------------#
 
 adf_log_M_d2004 <- ur.df(dfd2004$log_M,
                    type = c("none"),
@@ -217,7 +143,9 @@ adf_log_TCRM_d2004 <- ur.df(dfd2004$log_TCRM,
 
 summary(adf_log_TCRM_d2004)
 
-# completa diferenciada
+#------------------------------#
+# BASE DESDE 2004 DIFERENCIADA #
+#------------------------------#
 
 adf_dlog_M_d2004 <- ur.df(diff(dfd2004$log_M),
                     type = c("none"),
@@ -241,64 +169,18 @@ adf_dlog_TCRM_d2004 <- ur.df(diff(dfd2004$log_TCRM),
 
 summary(adf_dlog_TCRM_d2004)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# rm(adf_log_X,
-#    adf_log_M,
-#    adf_log_PBI_Arg,
-#    adf_log_PBI_Socios,
-#    adf_log_TCRM,
-#    adf_dlog_X,
-#    adf_dlog_M,
-#    adf_dlog_PBI_Arg,
-#    adf_dlog_PBI_Socios,
-#    adf_dlog_TCRM
-# )
+rm(list = ls(pattern = "^adf"))
 
 # Estacionalidad ####
-## Estacionalidad en toda la base
+## Estacionalidad en toda la base ####
+### Estacionalidad importaciones
+
 x11_log_M <- df |>
   model(x11 = X_13ARIMA_SEATS(log_M ~ x11())) |>
   components()
 
-autoplot(x11_log_M) +
-  labs(title =
-         "Decomposition of total US retail employment using X-11.")
-
 x11_log_M |>
-  ggplot(aes(x = x11_log_M$Q)) +
+  ggplot(aes(x = Q)) +
   geom_line(aes(y = log_M, colour = "Data")) +
   geom_line(aes(y = season_adjust,
                 colour = "Seasonally Adjusted")) +
@@ -309,72 +191,119 @@ x11_log_M |>
     values = c("gray", "#0072B2", "#D55E00"),
     breaks = c("Data", "Seasonally Adjusted", "Trend")
   )
-## Estacionalidad hasta 2003
+
+### Estacionalidad demanda global
+x11_log_demandaGlobal <- df |>
+  model(x11 = X_13ARIMA_SEATS(log_demandaGlobal ~ x11())) |>
+  components()
+
+### Estacionalidad TCRM
+x11_log_TCRM <- df |>
+  model(x11 = X_13ARIMA_SEATS(log_TCRM ~ x11())) |>
+  components()
+
+## Estacionalidad hasta 2003 ####
+### Estacionalidad importaciones
 x11_log_M_h2003 <- dfh2003 |>
   model(x11 = X_13ARIMA_SEATS(log_M ~ x11())) |>
   components()
 
-autoplot(x11_log_M_h2003) +
-  labs(title =
-         "Decomposition of total US retail employment using X-11.")
-
 x11_log_M_h2003 |>
-  ggplot(aes(x = x11_log_M_h2003$Q)) +
+  ggplot(aes(x = Q)) +
   geom_line(aes(y = log_M, colour = "Data")) +
   geom_line(aes(y = season_adjust,
                 colour = "Seasonally Adjusted")) +
   geom_line(aes(y = trend, colour = "Trend")) +
   labs(y = "Persons (thousands)",
-       title = "Ajuste Estacional - Importaciones") +
+       title = "Ajuste Estacional - Importaciones hasta 2003") +
   scale_colour_manual(
     values = c("gray", "#0072B2", "#D55E00"),
     breaks = c("Data", "Seasonally Adjusted", "Trend")
   )
 
-## Estacionalidad desde 2004
+### Estacionalidad demanda global
+x11_log_demandaGlobal_h2003 <- dfh2003 |>
+  model(x11 = X_13ARIMA_SEATS(log_demandaGlobal ~ x11())) |>
+  components()
+
+### Estacionalidad TCRM
+x11_log_TCRM_h2003 <- dfh2003 |>
+  model(x11 = X_13ARIMA_SEATS(log_TCRM ~ x11())) |>
+  components()
+## Estacionalidad desde 2004 ####
 x11_log_M_d2004 <- dfd2004 |>
   model(x11 = X_13ARIMA_SEATS(log_M ~ x11())) |>
   components()
 
-autoplot(x11_log_M_d2004) +
-  labs(title =
-         "Decomposition of total US retail employment using X-11.")
-
 x11_log_M_d2004 |>
-  ggplot(aes(x = x11_log_M_d2004$Q)) +
+  ggplot(aes(x = Q)) +
   geom_line(aes(y = log_M, colour = "Data")) +
   geom_line(aes(y = season_adjust,
                 colour = "Seasonally Adjusted")) +
   geom_line(aes(y = trend, colour = "Trend")) +
   labs(y = "Persons (thousands)",
-       title = "Ajuste Estacional - Importaciones") +
+       title = "Ajuste Estacional - Importaciones hasta 2003") +
   scale_colour_manual(
     values = c("gray", "#0072B2", "#D55E00"),
     breaks = c("Data", "Seasonally Adjusted", "Trend")
   )
 
+### Estacionalidad demanda global
+x11_log_demandaGlobal_d2004 <- dfd2004 |>
+  model(x11 = X_13ARIMA_SEATS(log_demandaGlobal ~ x11())) |>
+  components()
 
-# Chequeamos la estabilidad estructural de la función de importaciones
-# TEST DE CHOW IMPO
-sctest(log_M ~ log_PBI_Arg + log_TCRM, type="Chow", point=24, data=df)
+### Estacionalidad TCRM
+x11_log_TCRM_d2004 <- dfd2004 |>
+  model(x11 = X_13ARIMA_SEATS(log_TCRM ~ x11())) |>
+  components()
 
+# Desestacionalizando ####
+df <- df %>% mutate(log_M = x11_log_M$season_adjust) 
+df <- df %>% mutate(log_demandaGlobal = x11_log_demandaGlobal$season_adjust) 
+df <- df %>% mutate(log_TCRM = x11_log_TCRM$season_adjust) 
 
+dfh2003 <- dfh2003 %>% mutate(log_M = x11_log_M_h2003$season_adjust) 
+dfh2003 <- dfh2003 %>% mutate(log_demandaGlobal = x11_log_demandaGlobal_h2003$season_adjust)
+dfh2003 <- dfh2003 %>% mutate(log_TCRM = x11_log_TCRM_h2003$season_adjust)
 
+dfd2004 <- dfd2004 %>% mutate(log_M = x11_log_M_d2004$season_adjust) 
+dfd2004 <- dfd2004 %>% mutate(log_demandaGlobal = x11_log_demandaGlobal_d2004$season_adjust)
+dfd2004 <- dfd2004 %>% mutate(log_TCRM = x11_log_TCRM_d2004$season_adjust)
 
-# ECM IMPORTACIONES (bivariado, uniecuacional)
-reg_coint_impo <- lm(log_M ~ log_PBI_Arg,data=df) #Relación de largo plazo
-residuos_impo <- reg_coint_impo$residuals # Capturamos los residuos
-tseries::adf.test(residuos_impo) # Vemos si el residuo es estacionario (OK)
+# Tests de Engle y Granger ####
 
-residuos_impo_lag <- -lag(residuos_impo)[-1]
-ecm_impo_2 <- lm(diff(log_M) ~ residuos_impo_lag + diff(log_PBI_Arg), data = df)
-summary(ecm_impo_2)
+## Base completa
+reg_coint <- lm(log_M ~ log_PBI_Arg + log_TCRM, data = df)
+residuos_coint <- reg_coint$residuals
+test_eg <- ur.df(residuos_coint,
+                   type = c("none"),
+                   lags = 4,
+                   selectlags = "AIC"
+                   )
+summary(test_eg)
 
-# ECM IMPORTACIONES (trivariado, uniecuacional)
-reg_coint_impo_3 <- lm(log_M ~ log_PBI_Arg + log_TCRM,data=df)
-residuos_impo_3 <- reg_coint_impo_3$residuals
-tseries::adf.test(residuos_impo_3)
+## Base hasta 2003
+reg_coint_h2003 <- lm(log_M ~ log_PBI_Arg + log_TCRM, data = dfh2003)
+residuos_coint_h2003 <- reg_coint_h2003$residuals
+test_eg_h2003 <- ur.df(residuos_coint_h2003,
+                 type = c("none"),
+                 lags = 4,
+                 selectlags = "AIC"
+                 )
+summary(test_eg_h2003)
 
+## Base hasta 2003
+reg_coint_d2004 <- lm(log_M ~ log_PBI_Arg + log_TCRM, data = dfd2004)
+residuos_coint_d2004 <- reg_coint_d2004$residuals
+test_eg_d2004 <- ur.df(residuos_coint_d2004,
+                       type = c("none"),
+                       lags = 4,
+                       selectlags = "AIC"
+                       )
+summary(test_eg_d2004)
+
+# ECM (trivariado, uniecuacional)
 residuos_impo_3_lag <- -lag(residuos_impo_3)[-1]
 ecm_impo_3 <- lm(diff(log_M) ~ residuos_impo_3_lag + diff(log_PBI_Arg) + diff(log_TCRM), data = df)
 summary(reg_coint_impo_3)
