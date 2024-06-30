@@ -114,6 +114,73 @@ tabla_ADF_d_d2004
 #    adf_dlog_TCRM
 # )
 
+# Estacionalidad ####
+## Estacionalidad en toda la base
+x11_log_M <- df |>
+  model(x11 = X_13ARIMA_SEATS(log_M ~ x11())) |>
+  components()
+
+autoplot(x11_log_M) +
+  labs(title =
+         "Decomposition of total US retail employment using X-11.")
+
+x11_log_M |>
+  ggplot(aes(x = x11_log_M$Q)) +
+  geom_line(aes(y = log_M, colour = "Data")) +
+  geom_line(aes(y = season_adjust,
+                colour = "Seasonally Adjusted")) +
+  geom_line(aes(y = trend, colour = "Trend")) +
+  labs(y = "Persons (thousands)",
+       title = "Ajuste Estacional - Importaciones") +
+  scale_colour_manual(
+    values = c("gray", "#0072B2", "#D55E00"),
+    breaks = c("Data", "Seasonally Adjusted", "Trend")
+  )
+## Estacionalidad hasta 2003
+x11_log_M_h2003 <- dfh2003 |>
+  model(x11 = X_13ARIMA_SEATS(log_M ~ x11())) |>
+  components()
+
+autoplot(x11_log_M_h2003) +
+  labs(title =
+         "Decomposition of total US retail employment using X-11.")
+
+x11_log_M_h2003 |>
+  ggplot(aes(x = x11_log_M_h2003$Q)) +
+  geom_line(aes(y = log_M, colour = "Data")) +
+  geom_line(aes(y = season_adjust,
+                colour = "Seasonally Adjusted")) +
+  geom_line(aes(y = trend, colour = "Trend")) +
+  labs(y = "Persons (thousands)",
+       title = "Ajuste Estacional - Importaciones") +
+  scale_colour_manual(
+    values = c("gray", "#0072B2", "#D55E00"),
+    breaks = c("Data", "Seasonally Adjusted", "Trend")
+  )
+
+## Estacionalidad desde 2004
+x11_log_M_d2004 <- dfd2004 |>
+  model(x11 = X_13ARIMA_SEATS(log_M ~ x11())) |>
+  components()
+
+autoplot(x11_log_M_d2004) +
+  labs(title =
+         "Decomposition of total US retail employment using X-11.")
+
+x11_log_M_d2004 |>
+  ggplot(aes(x = x11_log_M_d2004$Q)) +
+  geom_line(aes(y = log_M, colour = "Data")) +
+  geom_line(aes(y = season_adjust,
+                colour = "Seasonally Adjusted")) +
+  geom_line(aes(y = trend, colour = "Trend")) +
+  labs(y = "Persons (thousands)",
+       title = "Ajuste Estacional - Importaciones") +
+  scale_colour_manual(
+    values = c("gray", "#0072B2", "#D55E00"),
+    breaks = c("Data", "Seasonally Adjusted", "Trend")
+  )
+
+
 # Chequeamos la estabilidad estructural de la función de importaciones
 # TEST DE CHOW IMPO
 sctest(log_M ~ log_PBI_Arg + log_TCRM, type="Chow", point=24, data=df)
