@@ -31,4 +31,12 @@ df <- df %>% mutate(log_PBI_Socios = log(df$PBI_Socios))
 df <- df %>% mutate(log_TCRM = log(df$TCRM))
 df <- df %>% mutate(log_demandaGlobal = log(df$demandaGlobal))
 
+#Slicing según Chow
+start_2003_Q4 <- which(df$Q == yearquarter("2003 Q4"))
+df_hasta_2003 <- df %>% slice(1:(start_2003_Q4 - 1))
+df_desde_2004 <- df %>% slice(start_2003_Q4:n())
+
+
 saveRDS(df, "bases/base_tp2.rds")
+saveRDS(df_hasta_2003, "bases/base_tp2_h2003.rds")
+saveRDS(df_desde_2004, "bases/base_tp2_d2004.rds")
