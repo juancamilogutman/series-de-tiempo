@@ -360,8 +360,38 @@ summary(vecm)
 # summary(vecm)
 
 
-## POST NESTOR:
+## CON NESTOR:
 data_vecm_d2004 <- dfd2004[, c("log_M", "log_TCRM", "log_demandaGlobal")]
 vecm_d2004 <- ca.jo(data_vecm_d2004, type="trace", ecdet="const", K=4)
 summary(vecm_d2004)
 
+vec_model <- cajorls(vecm_d2004, r = 1)
+summary(vec_model)
+vec_model
+
+# VAR ANTES DEL VEC PARA NESTOR ####
+VARselect(data_vecm_d2004, lag.max = 8, type = "both")
+# AIC indica 3 rezagos
+
+VAR_d2004 <- VAR(data_vecm_d2004, p = 3, type = "both")
+
+# ##### DIAGNOSTICOS####
+# serial_test <- serial.test(vec_model$rlm, lags.pt = 16, type = "PT.asymptotic")
+# summary(serial_test)
+#################
+
+
+
+# Estimate the VECM with r=1 (one cointegrating relationship)
+vecm_d2004 <- ca.jo(data_vecm_d2004, type="trace", ecdet="const", K=4, spec="longrun")
+
+# Estimate the restricted VECM
+vec_model <- cajorls(vecm_d2004, r = 1)
+
+# Extract the long-run income elasticity of imports
+income_elasticity <- vec_model$beta[,"log_demandaGlobal"]
+
+# Print the income elasticity
+print(income_elasticity)
+
+print(colnames(vec_model$beta))
