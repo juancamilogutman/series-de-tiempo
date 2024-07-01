@@ -48,3 +48,5 @@
 # residuos_impo_lag <- -lag(residuos_impo)[-1]
 # ecm_impo_2 <- lm(diff(log_M) ~ residuos_impo_lag + diff(log_PBI_Arg), data = df)
 # summary(ecm_impo_2)
+
+# vec2var()

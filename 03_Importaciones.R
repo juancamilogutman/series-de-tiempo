@@ -349,49 +349,42 @@ wb_d2004 <- lm(diff(log_M) ~ diff(log_demandaGlobal)+ diff(log_TCRM) + log_M_lag
 summary(wb_d2004)
 
 # VEC ####
-# Faltaría chequear con el test de johansen:
-data_vecm <- df[, c("log_M", "log_TCRM", "log_demandaGlobal")]
-vecm <- ca.jo(data_vecm, type="trace", ecdet="const", K=4)
-summary(vecm)
+## Base completa:
+### Test de Johansen
+data_vecm <- dfh2003[, c("log_M", "log_TCRM", "log_demandaGlobal")]
+VARselect(data_vecm, lag.max = 8, type = "both")
+# AIC indica 3 rezagos
+johansen <- ca.jo(data_vecm, type="trace", ecdet="const", K=3, spec="longrun")
+summary(johansen)
 
-# # PRENESTOR:
-# data_vecm <- df[, c("log_M", "log_TCRM", "log_demandaGlobal")]
-# vecm <- ca.jo(data_vecm, type="trace", ecdet="const", K=4)
-# summary(vecm)
+vecm <- cajorls(johansen, r = 1)
+vecm
+
+## Base hasta 2003:
+### Test de Johansen
+data_vecm_h2003 <- dfh2003[, c("log_M", "log_TCRM", "log_demandaGlobal")]
+VARselect(data_vecm_h2003, lag.max = 8, type = "both")
+# AIC indica 3 rezagos
+johansen_h2003 <- ca.jo(data_vecm_h2003, type="trace", ecdet="const", K=3, spec="longrun")
+summary(johansen_h2003)
+
+vecm_h2003 <- cajorls(johansen_h2003, r = 1)
+vecm_h2003
 
 
-## CON NESTOR:
+## Base desde 2004:
+### Test de Johansen
 data_vecm_d2004 <- dfd2004[, c("log_M", "log_TCRM", "log_demandaGlobal")]
-vecm_d2004 <- ca.jo(data_vecm_d2004, type="trace", ecdet="const", K=4)
-summary(vecm_d2004)
-
-vec_model <- cajorls(vecm_d2004, r = 1)
-summary(vec_model)
-vec_model
-
-# VAR ANTES DEL VEC PARA NESTOR ####
 VARselect(data_vecm_d2004, lag.max = 8, type = "both")
 # AIC indica 3 rezagos
+johansen_d2004 <- ca.jo(data_vecm_d2004, type="trace", ecdet="const", K=3, spec="longrun")
+summary(johansen_d2004)
 
-VAR_d2004 <- VAR(data_vecm_d2004, p = 3, type = "both")
+vecm_d2004 <- cajorls(johansen_d2004, r = 1)
+vecm_d2004
+
 
 # ##### DIAGNOSTICOS####
 # serial_test <- serial.test(vec_model$rlm, lags.pt = 16, type = "PT.asymptotic")
 # summary(serial_test)
-#################
-
-
-
-# Estimate the VECM with r=1 (one cointegrating relationship)
-vecm_d2004 <- ca.jo(data_vecm_d2004, type="trace", ecdet="const", K=4, spec="longrun")
-
-# Estimate the restricted VECM
-vec_model <- cajorls(vecm_d2004, r = 1)
-
-# Extract the long-run income elasticity of imports
-income_elasticity <- vec_model$beta[,"log_demandaGlobal"]
-
-# Print the income elasticity
-print(income_elasticity)
-
-print(colnames(vec_model$beta))
+########################
