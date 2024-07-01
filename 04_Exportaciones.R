@@ -308,7 +308,7 @@ summary(test_eg_d2004)
 
 ## Base Completa
 residuos_coint_lag <- lag(residuos_coint)[-1]
-ecm <- lm(diff(log_X) ~ residuos_coint_lag + diff(log_PBI_Socios) + diff(log_TCRM), data = df)
+ecm <- lm(diff(log_X) ~ residuos_coint_lag, data = df)
 summary(reg_coint)
 summary(ecm)
 
@@ -320,7 +320,7 @@ summary(ecm_h2003)
 
 ## Base desde 2004
 residuos_coint_d2004_lag <- lag(residuos_coint_d2004)[-1]
-ecm_d2004 <- lm(diff(log_X) ~ residuos_coint_d2004_lag + diff(log_PBI_Socios) + diff(log_TCRM), data = dfd2004)
+ecm_d2004 <- lm(diff(log_X) ~ residuos_coint_d2004_lag, data = dfd2004)
 summary(reg_coint_d2004)
 summary(ecm_d2004)
 
@@ -330,7 +330,7 @@ log_X_lag <- lag(df$log_X)[-1]
 log_PBIS_lag <- lag(df$log_PBI_Socios)[-1]
 log_TCRM_lag <- lag(df$log_TCRM)[-1]
 
-wb <- lm(diff(log_X) ~ diff(log_PBI_Socios)+ diff(log_TCRM) + log_X_lag + log_PBIS_lag + log_TCRM_lag, data = df)
+wb <- lm(diff(log_X) ~ log_X_lag + log_PBIS_lag + log_TCRM_lag, data = df)
 summary(wb)
 
 ## WB con base hasta 2003
@@ -338,7 +338,7 @@ log_X_lag_h2003 <- lag(dfh2003$log_X)[-1]
 log_PBIS_lag_h2003 <- lag(dfh2003$log_PBI_Socios)[-1]
 log_TCRM_lag_h2003 <- lag(dfh2003$log_TCRM)[-1]
 
-wb_h2003 <- lm(diff(log_X) ~ diff(log_PBI_Socios)+ diff(log_TCRM) + log_X_lag_h2003 + log_PBIS_lag_h2003 + log_TCRM_lag_h2003, data = dfh2003)
+wb_h2003 <- lm(diff(log_X) ~ log_X_lag_h2003 + log_PBIS_lag_h2003, data = dfh2003)
 summary(wb_h2003)
 
 ## WB con base desde 2004
@@ -346,16 +346,28 @@ log_X_lag_d2004 <- lag(dfd2004$log_X)[-1]
 log_PBIS_lag_d2004 <- lag(dfd2004$log_PBI_Socios)[-1]
 log_TCRM_lag_d2004 <- lag(dfd2004$log_TCRM)[-1]
 
-wb_d2004 <- lm(diff(log_X) ~ diff(log_PBI_Socios)+ diff(log_TCRM) + log_X_lag_d2004 + log_PBIS_lag_d2004 + log_TCRM_lag_d2004, data = dfd2004)
+wb_d2004 <- lm(diff(log_X) ~ log_X_lag_d2004 + log_PBIS_lag_d2004 + log_TCRM_lag_d2004, data = dfd2004)
 summary(wb_d2004)
 
 # VEC ####
 ## Base completa:
 ### Test de Johansen
-data_vecm <- dfh2003[, c("log_X", "log_TCRM", "log_PBI_Socios")]
-VARselect(data_vecm, lag.max = 8, type = "both")
-# AIC indica 7 rezagos
-johansen <- ca.jo(data_vecm, type="trace", ecdet="const", K=7, spec="longrun")
+data_vecm <- df[, c("log_X", "log_TCRM", "log_PBI_Socios")]
+VARselect(data_vecm, lag.max = 4, type = "both")
+
+# AIC indica 4 rezagos, pero hay que ver si
+# absorben toda la autocorrleación:
+varm <- VAR(data_vecm, p = 4,
+                  type = "both",
+                  season = NULL,
+                  exogen = NULL)
+
+autocorr_serial <- serial.test(varm,
+                                     lags.pt = 16,
+                                     type = "PT.asymptotic")
+autocorr_serial
+
+johansen <- ca.jo(data_vecm, type="trace", ecdet="const", K=4, spec="longrun")
 summary(johansen)
 
 vecm <- cajorls(johansen, r = 1)
@@ -364,31 +376,49 @@ vecm
 ## Base hasta 2003:
 ### Test de Johansen
 data_vecm_h2003 <- dfh2003[, c("log_X", "log_TCRM", "log_PBI_Socios")]
-VARselect(data_vecm_h2003, lag.max = 8, type = "both")
-# AIC indica 7 rezagos
-johansen_h2003 <- ca.jo(data_vecm_h2003, type="trace", ecdet="none", K=7, spec="longrun")
+VARselect(data_vecm_h2003, lag.max = 4, type = "both")
+
+# AIC indica 4 rezagos, pero hay que ver si
+# absorben toda la autocorrleación:
+varm_h2003 <- VAR(data_vecm_h2003, p = 4,
+                  type = "both",
+                  season = NULL,
+                  exogen = NULL)
+
+autocorr_serial_h2003 <- serial.test(varm_h2003,
+                                     lags.pt = 16,
+                                     type = "PT.asymptotic")
+autocorr_serial_h2003
+
+johansen_h2003 <- ca.jo(data_vecm_h2003, type="trace", ecdet="const", K=4, spec="longrun")
 summary(johansen_h2003)
 
 vecm_h2003 <- cajorls(johansen_h2003, r = 1)
 vecm_h2003
 
-
 ## Base desde 2004:
 ### Test de Johansen
 data_vecm_d2004 <- dfd2004[, c("log_X", "log_TCRM", "log_PBI_Socios")]
-VARselect(data_vecm_d2004, lag.max = 8, type = "both")
-# AIC indica 2 rezagos
+VARselect(data_vecm_d2004, lag.max = 4, type = "both")
+
+# AIC indica 4 rezagos, pero hay que ver si
+# absorben toda la autocorrleación:
+varm_d2004 <- VAR(data_vecm_d2004, p = 2,
+                  type = "both",
+                  season = NULL,
+                  exogen = NULL)
+
+autocorr_serial_d2004 <- serial.test(varm_d2004,
+                                     lags.pt = 16,
+                                     type = "PT.asymptotic")
+autocorr_serial_d2004
+#Todo en orden, no rechazamos la hipótesis de no autocorrelación serial.
+
 johansen_d2004 <- ca.jo(data_vecm_d2004, type="trace", ecdet="const", K=2, spec="longrun")
 summary(johansen_d2004)
 
 vecm_d2004 <- cajorls(johansen_d2004, r = 1)
 vecm_d2004
-
-
-# ##### DIAGNOSTICOS####
-# serial_test <- serial.test(vec_model$rlm, lags.pt = 16, type = "PT.asymptotic")
-# summary(serial_test)
-########################
 
 
 

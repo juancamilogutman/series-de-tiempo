@@ -294,7 +294,7 @@ test_eg_h2003 <- ur.df(residuos_coint_h2003,
 summary(test_eg_h2003)
 
 ## Base desde 2004
-reg_coint_d2004 <- lm(log_M ~ log_demandaGlobal + log_TCRM, data = dfd2004)
+reg_coint_d2004 <- lm(log_M ~ log_demandaGlobal, data = dfd2004)
 residuos_coint_d2004 <- reg_coint_d2004$residuals
 test_eg_d2004 <- ur.df(residuos_coint_d2004,
                        type = c("none"),
@@ -318,7 +318,7 @@ summary(ecm_h2003)
 
 ## Base desde 2004
 residuos_coint_d2004_lag <- lag(residuos_coint_d2004)[-1]
-ecm_d2004 <- lm(diff(log_M) ~ residuos_coint_d2004_lag + diff(log_demandaGlobal) + diff(log_TCRM), data = dfd2004)
+ecm_d2004 <- lm(diff(log_M) ~ residuos_coint_d2004_lag + diff(log_demandaGlobal), data = dfd2004)
 summary(reg_coint_d2004)
 summary(ecm_d2004)
 
@@ -329,7 +329,7 @@ log_M_lag <- lag(df$log_M)[-1]
 log_demandaGlobal_lag <- lag(df$log_demandaGlobal)[-1]
 log_TCRM_lag <- lag(df$log_TCRM)[-1]
 
-wb <- lm(diff(log_M) ~ diff(log_demandaGlobal)+ diff(log_TCRM) + log_M_lag + log_demandaGlobal_lag + log_TCRM_lag, data = df)
+wb <- lm(diff(log_M) ~ diff(log_demandaGlobal)+ diff(log_TCRM) + log_M_lag + log_demandaGlobal_lag, data = df)
 summary(wb)
 
 ## WB con base hasta 2003
@@ -345,13 +345,13 @@ log_M_lag_d2004 <- lag(dfd2004$log_M)[-1]
 log_demandaGlobal_lag_d2004 <- lag(dfd2004$log_demandaGlobal)[-1]
 log_TCRM_lag_d2004 <- lag(dfd2004$log_TCRM)[-1]
 
-wb_d2004 <- lm(diff(log_M) ~ diff(log_demandaGlobal)+ diff(log_TCRM) + log_M_lag_d2004 + log_demandaGlobal_lag_d2004 + log_TCRM_lag_d2004, data = dfd2004)
+wb_d2004 <- lm(diff(log_M) ~ diff(log_demandaGlobal) + log_M_lag_d2004 + log_demandaGlobal_lag_d2004 + log_TCRM_lag_d2004, data = dfd2004)
 summary(wb_d2004)
 
 # VEC ####
 ## Base completa:
 ### Test de Johansen
-data_vecm <- dfh2003[, c("log_M", "log_TCRM", "log_demandaGlobal")]
+data_vecm <- df[, c("log_M", "log_TCRM", "log_demandaGlobal")]
 VARselect(data_vecm, lag.max = 4, type = "both")
 
 # AIC indica 4 rezagos, pero hay que ver si
@@ -419,9 +419,3 @@ summary(johansen_d2004)
 
 vecm_d2004 <- cajorls(johansen_d2004, r = 1)
 vecm_d2004
-
-
-# ##### DIAGNOSTICOS####
-# serial_test <- serial.test(vec_model$rlm, lags.pt = 16, type = "PT.asymptotic")
-# summary(serial_test)
-########################
