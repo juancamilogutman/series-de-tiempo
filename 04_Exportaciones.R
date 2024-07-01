@@ -100,8 +100,7 @@ summary(adf_log_TCRM_h2003)
 adf_dlog_X_h2003 <- ur.df(diff(dfh2003$log_X),
                           type = c("none"),
                           lags = 4,
-                          selectlags = "AIC"
-)
+                          selectlags = "AIC")
 summary(adf_dlog_X_h2003)
 
 adf_dlog_PBIS_h2003 <- ur.df(diff(dfh2003$log_PBI_Socios),
@@ -280,8 +279,7 @@ residuos_coint <- reg_coint$residuals
 test_eg <- ur.df(residuos_coint,
                  type = c("none"),
                  lags = 4,
-                 selectlags = "AIC"
-)
+                 selectlags = "AIC")
 summary(test_eg)
 
 ## Base hasta 2003
@@ -325,7 +323,6 @@ residuos_coint_d2004_lag <- lag(residuos_coint_d2004)[-1]
 ecm_d2004 <- lm(diff(log_X) ~ residuos_coint_d2004_lag + diff(log_PBI_Socios) + diff(log_TCRM), data = dfd2004)
 summary(reg_coint_d2004)
 summary(ecm_d2004)
-
 
 # Identificación siguiendo a Wicken y Breusch ####
 ## WB con base completa
