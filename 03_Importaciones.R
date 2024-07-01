@@ -352,20 +352,45 @@ summary(wb_d2004)
 ## Base completa:
 ### Test de Johansen
 data_vecm <- dfh2003[, c("log_M", "log_TCRM", "log_demandaGlobal")]
-VARselect(data_vecm, lag.max = 8, type = "both")
-# AIC indica 3 rezagos
-johansen <- ca.jo(data_vecm, type="trace", ecdet="const", K=3, spec="longrun")
+VARselect(data_vecm, lag.max = 4, type = "both")
+
+# AIC indica 4 rezagos, pero hay que ver si
+# absorben toda la autocorrleación:
+varm <- VAR(data_vecm, p = 4,
+            type = "both",
+            season = NULL,
+            exogen = NULL)
+
+autocorr_serial <- serial.test(varm,
+                               lags.pt = 16,
+                               type = "PT.asymptotic")
+autocorr_serial
+
+johansen <- ca.jo(data_vecm, type="trace", ecdet="const", K=4, spec="longrun")
 summary(johansen)
 
 vecm <- cajorls(johansen, r = 1)
 vecm
 
+
 ## Base hasta 2003:
 ### Test de Johansen
 data_vecm_h2003 <- dfh2003[, c("log_M", "log_TCRM", "log_demandaGlobal")]
-VARselect(data_vecm_h2003, lag.max = 8, type = "both")
-# AIC indica 3 rezagos
-johansen_h2003 <- ca.jo(data_vecm_h2003, type="trace", ecdet="const", K=3, spec="longrun")
+VARselect(data_vecm_h2003, lag.max = 4, type = "both")
+# AIC indica 4 rezagos
+# AIC indica 4 rezagos, pero hay que ver si
+# absorben toda la autocorrleación:
+varm_h2003 <- VAR(data_vecm_h2003, p = 4,
+            type = "both",
+            season = NULL,
+            exogen = NULL)
+
+autocorr_serial_h2003 <- serial.test(varm_h2003,
+                               lags.pt = 16,
+                               type = "PT.asymptotic")
+autocorr_serial_h2003
+
+johansen_h2003 <- ca.jo(data_vecm_h2003, type="trace", ecdet="const", K=4, spec="longrun")
 summary(johansen_h2003)
 
 vecm_h2003 <- cajorls(johansen_h2003, r = 1)
@@ -375,8 +400,20 @@ vecm_h2003
 ## Base desde 2004:
 ### Test de Johansen
 data_vecm_d2004 <- dfd2004[, c("log_M", "log_TCRM", "log_demandaGlobal")]
-VARselect(data_vecm_d2004, lag.max = 8, type = "both")
-# AIC indica 3 rezagos
+VARselect(data_vecm_d2004, lag.max = 4, type = "both")
+
+# AIC indica 4 rezagos, pero hay que ver si
+# absorben toda la autocorrleación:
+varm_d2004 <- VAR(data_vecm_d2004, p = 4,
+                  type = "both",
+                  season = NULL,
+                  exogen = NULL)
+
+autocorr_serial_d2004 <- serial.test(varm_d2004,
+                                     lags.pt = 16,
+                                     type = "PT.asymptotic")
+autocorr_serial_d2004
+
 johansen_d2004 <- ca.jo(data_vecm_d2004, type="trace", ecdet="const", K=3, spec="longrun")
 summary(johansen_d2004)
 
